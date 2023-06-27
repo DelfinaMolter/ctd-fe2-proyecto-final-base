@@ -20,33 +20,29 @@ import {
   BotonSuscribir,
   CotenedorTexto,
 } from "./styled";
+import { INoticiasNormalizadas } from "./types";
 
-export interface INoticiasNormalizadas {
-  id: number;
-  titulo: string;
-  descripcion: string;
-  fecha: number | string;
-  esPremium: boolean;
-  imagen: string;
-  descripcionCorta?: string;
-}
+
 
 const Noticias = () => {
   const [noticias, setNoticias] = useState<INoticiasNormalizadas[]>([]);
   const [modal, setModal] = useState<INoticiasNormalizadas | null>(null);
+
+  const nomralizarTitulo = (titulo: string)=>{
+    return titulo
+            .split(" ")
+            .map((str) => {
+              return str.charAt(0).toUpperCase() + str.slice(1);
+            })
+            .join(" ");
+  }
 
   useEffect(() => {
     const obtenerInformacion = async () => {
       const respuesta = await obtenerNoticias();
 
       const data = respuesta.map((n) => {
-        const titulo = n.titulo
-          .split(" ")
-          .map((str) => {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-          })
-          .join(" ");
-
+        const titulo = nomralizarTitulo(n.titulo);
         const ahora = new Date();
         const minutosTranscurridos = Math.floor(
           (ahora.getTime() - n.fecha.getTime()) / 60000
@@ -59,7 +55,7 @@ const Noticias = () => {
           fecha: `Hace ${minutosTranscurridos} minutos`,
           esPremium: n.esPremium,
           imagen: n.imagen,
-          descripcionCorta: n.descripcion.substring(0, 100),
+          descripcionCorta: n.descripcion.substring(0, 100)
         };
       });
 

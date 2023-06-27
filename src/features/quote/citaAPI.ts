@@ -5,6 +5,7 @@ export const obtenerCita: (personaje?: string) => Promise<ICita> = async (
   personaje
 ) => {
   if (personaje && parseInt(personaje)) {
+    console.log(personaje)
     throw new Error("El nombre debe ser un texto");
   }
 
