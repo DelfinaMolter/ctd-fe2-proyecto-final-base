@@ -3,11 +3,9 @@ import Cita from "./features/quote/Cita";
 import "./App.css";
 import Bio from "./features/bio/Bio";
 import Noticias from "./features/news/Noticias";
-import { ModalContextProvider } from "./features/news/contextModal";
-
 function App() {
   return (
-    <ModalContextProvider>
+
     <div className="App">
       <header className="App-header">
         <img
@@ -24,7 +22,7 @@ function App() {
         <Noticias />
       </section>
     </div>
-    </ModalContextProvider>
+
   );
 }
 

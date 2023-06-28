@@ -7,7 +7,7 @@ import {
 import { INoticiasNormalizadas } from "./types";
 import normalizarNoticia from "./utils";
 import { ListadoNoticias } from "./ListadoNoticias";
-import useModal from "./contextModal";
+import useModal, { ModalContextProvider } from "./contextModal";
 import { Modal } from "./Modal";
 
 //  Implementacion del principio SOLID:  Principio de Responsabilidad Única
@@ -17,7 +17,6 @@ import { Modal } from "./Modal";
 
 const Noticias = () => {
   const [noticias, setNoticias] = useState<INoticiasNormalizadas[]>([]);
-  const { modal } = useModal();
 
   useEffect(() => {
     const obtenerInformacion = async () => {
@@ -33,13 +32,23 @@ const Noticias = () => {
   }, []);
 
   return (
-
-    <ContenedorNoticias>
-      <TituloNoticias>Noticias de los Simpsons</TituloNoticias>
-      <ListadoNoticias noticias={noticias} />
-      {modal && <Modal/>}
-    </ContenedorNoticias>
+    <ModalContextProvider>
+      <ContenedorNoticias>
+        <TituloNoticias>Noticias de los Simpsons</TituloNoticias>
+        <ListadoNoticias noticias={noticias} />
+        <Child/>
+      </ContenedorNoticias>
+    </ModalContextProvider>
   );
 };
+
+const Child =()=>{
+  const { modal } = useModal();
+  return(
+    <>
+    {modal && <Modal/>}
+    </>
+  )
+}
 
 export default Noticias;
