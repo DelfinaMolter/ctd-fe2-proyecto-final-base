@@ -10,6 +10,9 @@ import { ListadoNoticias } from "./ListadoNoticias";
 import useModal from "./contextModal";
 import { Modal } from "./Modal";
 
+//  Implementacion del principio SOLID:  Principio de Responsabilidad Única
+//  Separé todas las diferente acciones para que cada componente tenga su tarea y así sea mas sensillo visualizar y entender el codigo. Tambien facilita la localizacion de un error si lo hubiera.
+
 
 
 const Noticias = () => {
