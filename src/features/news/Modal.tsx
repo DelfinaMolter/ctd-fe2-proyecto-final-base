@@ -9,8 +9,12 @@ import { ContenedorModal } from "./styled";
 export const Modal = () =>{
     const { modal } = useModal();
     return(
-        <ContenedorModal>
-        { modal?.esPremium ? <ModalPremium/>: <ModalFree/> }
-        </ContenedorModal>
+        <>
+        { modal && 
+            <ContenedorModal>
+            {modal?.esPremium ? <ModalPremium/>: <ModalFree/>} 
+            </ContenedorModal>
+        }
+        </>
     )
 }

@@ -15,7 +15,9 @@ export const ModalFree = () =>{
     const { modal , setModal} = useModal();
     return(
         <TarjetaModal>
-            <CloseButton onClick={() => setModal(null)}>
+            <CloseButton onClick={() => {
+                setModal(null)
+            }}>
                 <img src={Close} alt="close-button" />
             </CloseButton>
             <ImagenModal src={modal?.imagen} alt="news-image" />

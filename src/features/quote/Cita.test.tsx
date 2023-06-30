@@ -1,40 +1,57 @@
-
-import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
-// import { Provider } from "react-redux";
-// import { store } from "../../app/store";
 import Cita from "./Cita";
 import userEvent from '@testing-library/user-event';
 import { render } from "../../test-utils";
 import { API_URL } from "../../app/constants";
-// import { act } from "react-dom/test-utils";
+import { mockedCitas } from "./mockedCitas";
+
+// const dataAleatorea = [{
+//     quote: "Well, I'm better than dirt. Well, most kinds of dirt. I mean not that fancy store bought dirt. That stuffs loaded with nutrients. I.. I can't compete with that stuff.",
+//     character: "Moe Szyslak",
+//     image: "https://cdn.glitch.com/3c3ffadc-3406-4440-bb95-d40ec8fcde72%2FMoeSzyslak.png?1497567512411",
+//     characterDirection: "Right"
+// }];
+
+// const dataPersonalizada= [
+//     {
+//     quote: "Oh, so they have Internet on computers now!",
+//     character: "Homer Simpson",
+//     image: "https://cdn.glitch.com/3c3ffadc-3406-4440-bb95-d40ec8fcde72%2FHomerSimpson.png?1497567511939",
+//     characterDirection: "Right"
+//     }
+//     ]
+
+// const dataVacia: string[] = [];
+
+// export const handlers = [
+//     rest.get(API_URL, (req, res, ctx) => {
+//         return res(ctx.json(dataAleatorea), ctx.status(200));
+//     }),
+// ];
 
 
-const dataAleatorea = [{
-    quote: "Well, I'm better than dirt. Well, most kinds of dirt. I mean not that fancy store bought dirt. That stuffs loaded with nutrients. I.. I can't compete with that stuff.",
-    character: "Moe Szyslak",
-    image: "https://cdn.glitch.com/3c3ffadc-3406-4440-bb95-d40ec8fcde72%2FMoeSzyslak.png?1497567512411",
-    characterDirection: "Right"
-}];
+const randomQuote = mockedCitas[0].data;
+const validQueries = mockedCitas.map((q)=> q.query);
 
-const dataPersonalizada= [
-    {
-    quote: "Oh, so they have Internet on computers now!",
-    character: "Homer Simpson",
-    image: "https://cdn.glitch.com/3c3ffadc-3406-4440-bb95-d40ec8fcde72%2FHomerSimpson.png?1497567511939",
-    characterDirection: "Right"
-    }
-    ]
+const handlers = [
+    rest.get(`${API_URL}`, (req, res, ctx) => {
+        const character = req.url.searchParams.get('character');
 
-const dataVacia: string[] = [];
+        if (character === null) {
+            return res(ctx.json([randomQuote]), ctx.delay(150));
+        }
 
+        if (validQueries.includes(character)) {
+            const quote = mockedCitas.find((q) => q.query === character);
+            return res(ctx.json([quote?.data]));
+        }
 
-export const handlers = [
-    rest.get(API_URL, (req, res, ctx) => {
-        return res(ctx.json(dataAleatorea), ctx.status(200));
+        return res(ctx.json([]), ctx.delay(150));
     }),
 ];
+
 
 const server = setupServer(...handlers);
 
@@ -68,7 +85,7 @@ describe('Citas', () => {
             renderComponentDefault();
             const input = screen.getByRole('textbox', {name:'Author Cita'});
             userEvent.click(input);
-            userEvent.keyboard("moe")
+            await userEvent.type(input,"moe")
             const buttonSearch = await screen.findByRole('button', {name:/Obtener Cita/i});
             expect(buttonSearch).toBeInTheDocument();
         });
@@ -92,33 +109,25 @@ describe('Citas', () => {
             })
         })
         it('Cuando se rederiza una cita del personaje tipeado', async() =>{
-            const personaje= "homer";
-            server.use(
-                rest.get(`${API_URL}?character=${personaje}`, (req, res, ctx) => {
-                    return res(ctx.json(dataPersonalizada), ctx.status(200));
-                }),
-            )
             renderComponentDefault();
             const input = screen.getByRole('textbox', {name:'Author Cita'});
             userEvent.click(input);
-            userEvent.keyboard(personaje)
+            await userEvent.type(input,"Homer")
             const buttonSearch = await screen.findByText(/Obtener Cita/i);
             userEvent.click(buttonSearch);
             await waitFor(()=>{
-                expect(screen.getByText(dataPersonalizada[0].quote)).toBeInTheDocument()
+                expect(screen.getByText(mockedCitas[1].data.quote)).toBeInTheDocument()
             })
         })
         
     });
 
     describe("Cuando la info brindada es erronea", ()=>{
-        //No funcion
-        it.skip('Cuando se tipea numeros en el input', async() =>{
+        it('Cuando se tipea numeros en el input', async() =>{
             renderComponentDefault();
             const input = screen.getByPlaceholderText('Ingresa el nombre del autor');
             userEvent.click(input);
-            userEvent.keyboard("1")
-            screen.debug()
+            await userEvent.type(input,"1")
             const buttonSearch = screen.getByRole('button', {name: /Obtener Cita/i});
             userEvent.click(buttonSearch);
             await waitFor(()=>{
@@ -126,16 +135,10 @@ describe('Citas', () => {
             })
         })
         it('Cuando se tipea un personaje que no existe en el input', async() =>{
-            const personaje= "homero";
-            server.use(
-                rest.get(`${API_URL}?character=${personaje}`, (req, res, ctx) => {
-                    return res(ctx.json(dataVacia), ctx.status(200));
-                }),
-            )
             renderComponentDefault();
             const input = screen.getByRole('textbox', {name:'Author Cita'});
             userEvent.click(input);
-            userEvent.keyboard(personaje)
+            await userEvent.type(input,"homero")
             const buttonSearch = await screen.findByText(/Obtener Cita/i);
             userEvent.click(buttonSearch);
             await waitFor(()=>{

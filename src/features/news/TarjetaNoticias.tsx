@@ -9,6 +9,7 @@ import {
 } from "./styled";
 import { INoticiasNormalizadas } from "./types";
 
+
 interface IProps{
     noticia:INoticiasNormalizadas
 
@@ -16,6 +17,7 @@ interface IProps{
 
 const TarjetaNoticias =({noticia}:IProps)=>{
     const { setModal} = useModal();
+
     return(
         <TarjetaNoticia>
             <ImagenTarjetaNoticia src={noticia.imagen} />
@@ -24,7 +26,10 @@ const TarjetaNoticias =({noticia}:IProps)=>{
             <DescripcionTarjetaNoticia>
                 {noticia.descripcionCorta}
             </DescripcionTarjetaNoticia>
-            <BotonLectura onClick={() => setModal(noticia)}>Ver más</BotonLectura>
+            <BotonLectura onClick={() => {
+                setModal(noticia)
+
+                }}>Ver más</BotonLectura>
         </TarjetaNoticia>
     )
 }

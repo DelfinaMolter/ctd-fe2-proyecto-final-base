@@ -12,11 +12,16 @@ import useModal from "./contextModal";
 
 
 
+
 export const ModalPremium = () =>{
     const { setModal} = useModal();
+
     return(
         <TarjetaModal>
-            <CloseButton onClick={() => setModal(null)}>
+            <CloseButton onClick={() => {
+                setModal(null);
+
+            }}>
                 <img src={Close} alt="close-button" />
             </CloseButton>
             <ImagenModal src={SuscribeImage} alt="mr-burns-excelent" />
